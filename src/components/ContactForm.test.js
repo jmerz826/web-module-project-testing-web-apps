@@ -51,11 +51,33 @@ test('renders THREE error messages if user enters no values into any fields.', a
         expect(firstNameError).toBeInTheDocument();
         expect(lastNameError).toBeInTheDocument();
         expect(emailError).toBeInTheDocument();
-    })
+    });
 });
 
 test('renders ONE error message if user enters a valid first name and last name but no email.', async () => {
-    
+    render(<ContactForm />);
+
+    const submitButton = screen.queryByText(/submit/i);
+
+    // Type proper value into first name input
+    const firstNameInput = screen.queryByPlaceholderText(/edd/i);
+    userEvent.type(firstNameInput, 'Warren');
+
+    // Type proper value into last name input
+    const lastNameInput = screen.queryByPlaceholderText(/Burke/i);
+    userEvent.type(lastNameInput, 'Warren');
+
+    userEvent.click(submitButton);
+
+    await waitFor(() => {
+        const firstNameError = screen.queryByText('Error: firstName must have at least 5 characters.');
+        const lastNameError = screen.queryByText('Error: lastName is a required field.');
+        const emailError = screen.queryByText('Error: email must be a valid email address.');
+
+        expect(firstNameError).not.toBeInTheDocument();
+        expect(lastNameError).not.toBeInTheDocument();
+        expect(emailError).toBeInTheDocument();
+    });
 });
 
 test('renders "email must be a valid email address" if an invalid email is entered', async () => {
